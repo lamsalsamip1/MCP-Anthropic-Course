@@ -53,20 +53,20 @@ class MCPClient:
         return await self.session().call_tool(tool_name, tool_input)
 
     async def list_prompts(self) -> list[types.Prompt]:
-        # TODO: Return a list of prompts defined by the MCP server
-        return []
+        result = await self.session().list_prompts()
+        return result.prompts
 
     async def get_prompt(self, prompt_name, args: dict[str, str]):
-        # TODO: Get a particular prompt defined by the MCP server
-        return []
+        result = await self.session().get_prompt(prompt_name, args)
+        return result.messages
 
     async def read_resource(self, uri: str) -> Any:
         result = await self.session().read_resource(AnyUrl(uri))
         resource = result.contents[0]
         if isinstance(resource, types.TextResourceContents):
-            if resource.mime_type == "application/json":
-                return json.loads(resource.data)
-            return resource.data
+            if resource.mimeType == "application/json":
+                return json.loads(resource.text)
+            return resource.text
 
     async def cleanup(self):
         await self._exit_stack.aclose()
